@@ -35,7 +35,8 @@
     , youtube_api = 'https://gdata.youtube.com/feeds/api/videos/{id}?v=2&alt=jsonc&callback=?'
     , longurl_api = 'http://api.longurl.org/v2/expand?callback=?&format=json'
     , songs = $("#songs")
-    , icon = $("<i>").addClass("icon-play-circle");
+    , icon = $("<i>").addClass("icon-play-circle")
+    , first_fetch = true;
 
   $("#username").submit(function(){
     screen_name = $("#screen_name").val();
@@ -107,13 +108,20 @@
       }
   });
 
-
   /****/
   function onYouTubePlayerReady(playerId) {
     ytplayer = document.getElementById("myytplayer");
     ytplayer.addEventListener("onStateChange", "onytplayerStateChange");
     init = true;
     last_load = (new Date).getTime();
+    interval = setInterval(function(){
+      var state = ytplayer.getPlayerState();
+      if(state != -1){
+        clearInterval(interval);
+      }else{
+        songs.trigger("next");
+      }
+    }, 3000);
   }
 
   function onytplayerStateChange(state){
